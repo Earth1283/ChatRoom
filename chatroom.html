@@ -1,60 +1,67 @@
-<!-- chatroom.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatroom</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Basic styling for chat */
+    #chat {
+      width: 100%;
+      height: 300px;
+      overflow-y: auto;
+    }
+    #messageInput {
+      width: 80%;
+    }
+    #channels {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-  <div class="chat-container">
-    <ul id="messages"></ul>
+  <div id="channels">
+    <button onclick="joinChannel('general')">#general</button>
+    <button onclick="joinChannel('casual')">#casual</button>
   </div>
-  <input type="text" id="messageInput" placeholder="Type your message...">
-  <button id="sendButton">Send</button>
-  <div id="typingIndicator"></div>
+
+  <div id="chat"></div>
+
+  <input type="text" id="messageInput" placeholder="Type a message..." oninput="typing()">
+  <button onclick="sendMessage()">Send</button>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    const messagesList = document.getElementById("messages");
-    const messageInput = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-    const typingIndicator = document.getElementById("typingIndicator");
+    let currentChannel = 'general';
 
-    // Listen for new messages
-    socket.on('newMessage', (data) => {
-      const li = document.createElement("li");
-      li.textContent = `${data.username}: ${data.message}`;
-      messagesList.appendChild(li);
-      autoScrollToBottom(); // Scroll to bottom after adding a new message
-    });
-
-    // Listen for typing indicator
-    socket.on('typing', (username) => {
-      typingIndicator.textContent = `${username} is typing...`;
-    });
-
-    // Send new message when the send button is clicked
-    sendButton.addEventListener("click", () => {
-      const message = messageInput.value;
-      if (message.trim()) {
-        socket.emit('sendMessage', message, 'username'); // Replace 'username' with the actual username
-        messageInput.value = ''; // Clear input field
-      }
-    });
-
-    // Emit typing event when the user is typing
-    messageInput.addEventListener('input', () => {
-      socket.emit('typing', 'username'); // Replace 'username' with actual username
-    });
-
-    // Auto-scroll to bottom
-    function autoScrollToBottom() {
-      const chatContainer = document.querySelector('.chat-container');
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+    function joinChannel(channel) {
+      currentChannel = channel;
+      socket.emit('joinChannel', channel);
+      document.getElementById('chat').innerHTML = ''; // Clear the chat window
     }
+
+    function sendMessage() {
+      const message = document.getElementById('messageInput').value;
+      socket.emit('sendMessage', message, 'Username'); // Replace 'Username' with real user data
+      document.getElementById('messageInput').value = ''; // Clear the input
+    }
+
+    function typing() {
+      socket.emit('typing', 'Username'); // Replace 'Username' with real user data
+    }
+
+    socket.on('newMessage', (data) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><strong>${data.username}:</strong> ${data.message}</p>`;
+      chat.scrollTop = chat.scrollHeight; // Scroll to bottom
+    });
+
+    socket.on('typing', (username) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><em>${username} is typing...</em></p>`;
+      chat.scrollTop = chat.scrollHeight; // Scroll to bottom
+    });
   </script>
 </body>
 </html>
