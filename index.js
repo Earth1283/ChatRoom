@@ -4,6 +4,9 @@ const socketIo = require('socket.io');
 const http = require('http');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const csvWriter = require('csv-writer').createObjectCsvWriter;
+const csvParser = require('csv-parser');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -87,7 +90,32 @@ app.get('/', checkLogin, (req, res) => {
 io.on('connection', (socket) => {
   console.log('A user connected');
 
+  // Send last 20 messages from the CSV to the new user
+  fs.createReadStream('messages.csv')
+    .pipe(csvParser())
+    .on('data', (row) => {
+      socket.emit('newMessage', row);
+    })
+    .on('end', () => {
+      console.log('Finished sending previous messages');
+    });
+
   socket.on('sendMessage', (message, username) => {
+    // Write the new message to the CSV file
+    const writer = csvWriter({
+      path: 'messages.csv',
+      header: [
+        { id: 'username', title: 'username' },
+        { id: 'message', title: 'message' },
+      ],
+      append: true,
+    });
+
+    writer.writeRecords([{ username, message }])
+      .then(() => console.log('Message written to CSV'))
+      .catch((err) => console.error('Error writing message to CSV:', err));
+
+    // Broadcast the message to all connected clients
     io.emit('newMessage', { message, username });
   });
 
