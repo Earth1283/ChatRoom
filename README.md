@@ -1,2 +1,2 @@
 # ChatRoom
-Nice chatroom for casual usage. Not advised for productino senerios
+Nice chatroom for casual usage. Not advised for production scenarios
