@@ -90,11 +90,21 @@ app.get('/', checkLogin, (req, res) => {
 io.on('connection', (socket) => {
   console.log('A user connected');
 
+  // Check if the messages.csv file exists, and create it if not
+  const filePath = 'messages.csv';
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, 'username,message\n'); // Create CSV with headers
+  }
+
   // Send last 20 messages from the CSV to the new user
-  fs.createReadStream('messages.csv')
+  let messageCount = 0;
+  fs.createReadStream(filePath)
     .pipe(csvParser())
     .on('data', (row) => {
-      socket.emit('newMessage', row);
+      if (messageCount < 20) {
+        socket.emit('newMessage', row);
+        messageCount++;
+      }
     })
     .on('end', () => {
       console.log('Finished sending previous messages');
@@ -103,7 +113,7 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', (message, username) => {
     // Write the new message to the CSV file
     const writer = csvWriter({
-      path: 'messages.csv',
+      path: filePath,
       header: [
         { id: 'username', title: 'username' },
         { id: 'message', title: 'message' },
