@@ -42,5 +42,5 @@ files.forEach(file => {
 
 // After all downloads are complete
 console.log('Thanks for downloading <3');
-console.log('Remember to run `npm install express sqlite3 socket.io cookie-parser bcryptjs` to install the npm dependencies');
+console.log('Remember to run `npm install express sqlite3 socket.io cookie-parser bcryptjs csv-writer csv-parser` to install the npm dependencies');
 console.log('Additional information is within README.md');
