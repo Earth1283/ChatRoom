@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat { height: 500px; overflow-y: auto; border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; }
+        #message { width: 100%; }
+        #typing { font-size: 0.9em; color: gray; }
+        .message { margin: 5px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Chatroom, {{ current_user.id }}</h1>
+    <div id="chat">
+        {% for msg in messages %}
+        <div class="message">{{ msg[0] }}: {{ msg[1] }}</div>
+        {% endfor %}
+    </div>
+    <input type="text" id="message" placeholder="Type a message..." oninput="typing()" autocomplete="off">
+    <button onclick="sendMessage()">Send</button>
+    <div id="typing"></div>
+
+    <script src="https://cdn.socket.io/4.1.1/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+        var typingTimeout;
+
+        // Emit message to server
+        function sendMessage() {
+            var message = document.getElementById('message').value;
+            socket.emit('message', message);
+            document.getElementById('message').value = '';
+            document.getElementById('typing').innerHTML = '';
+        }
+
+        // Emit typing event
+        function typing() {
+            clearTimeout(typingTimeout);
+            socket.emit('typing', '{{ current_user.id }}');
+            typingTimeout = setTimeout(function() {
+                socket.emit('typing', '');
+            }, 500);
+        }
+
+        // Listen for new messages
+        socket.on('new_message', function(data) {
+            var messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.textContent = data.username + ": " + data.message;
+            document.getElementById('chat').appendChild(messageDiv);
+        });
+
+        // Listen for typing indicator
+        socket.on('typing', function(data) {
+            if (data.username) {
+                document.getElementById('typing').innerHTML = data.username + " is typing...";
+            } else {
+                document.getElementById('typing').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
