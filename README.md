@@ -44,20 +44,22 @@ Follow these steps to get the chatroom application running on your local machine
     ```
 
 3.  **Install Dependencies:**
+    You do not have to follow this step if you cloned my repo with the git clone command (it comes "pre-packaged" with the dependencies)
+    
     Navigate to the project directory in your terminal and run:
     ```bash
     npm install express socket.io bcrypt express-session body-parser sqlite3
     ```
     This command installs all the necessary Node.js modules listed in `package.json`.
 
-4.  **Run the Server:**
+5.  **Run the Server:**
     Start the Node.js server by running:
     ```bash
     node index.js
     ```
     The server will start at `http://localhost:8000`.
 
-5.  **Access the Chatroom:**
+6.  **Access the Chatroom:**
     Open your web browser and go to [http://localhost:8000](http://localhost:8000).
 
 ## Usage Instructions
