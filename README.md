@@ -39,7 +39,7 @@ Follow these steps to get the chatroom application running on your local machine
 
 2.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Earth1283/ChatRoom # Replace [repository-url] with the actual repository URL
+    git clone https://github.com/Earth1283/ChatRoom 
     cd [repository-folder]   # Replace [repository-folder] with the cloned repository folder name
     ```
 
@@ -109,7 +109,7 @@ Follow these steps to get the chatroom application running on your local machine
 
 ## License
 
-[Optional: Add license information here, e.g., MIT License, Apache 2.0, etc.]
+This project is licensed under the MIT License
 
 ---
 
