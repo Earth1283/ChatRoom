@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to the Chatroom!</h1>
+            <div class="header-controls">
+                <button id="dark-mode-toggle" aria-label="Toggle Dark Mode">Dark Mode</button>
+            </div>
+        </header>
+        <div class="homepage">
+            <p>Please <a href="/login">login</a> or <a href="/register">register</a> to join the chat.</p>
+        </div>
+    </div>
+    <script>
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const header = document.querySelector('header');
+        const homepageDiv = document.querySelector('.homepage');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            container.classList.toggle('dark-mode');
+            header.classList.toggle('dark-mode');
+            homepageDiv.classList.toggle('dark-mode');
+
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateToggleButtonText(isDarkMode);
+        }
+
+        function updateToggleButtonText(isDarkMode) {
+            darkModeToggle.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedDarkMode = localStorage.getItem('darkMode');
+            if (storedDarkMode === 'true') {
+                toggleDarkMode();
+            }
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        });
+    </script>
+</body>
+</html>

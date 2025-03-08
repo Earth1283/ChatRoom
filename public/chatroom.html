@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to the Chatroom</h1>
+            <div class="header-controls">
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </header>
+        <div id="chat-window">
+            <ul id="messages"></ul>
+            <div id="typing-indicator"></div>
+            <form id="form">
+                <input type="text" id="input" autocomplete="off" placeholder="Type your message" />
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <button id="dark-mode-toggle" aria-label="Toggle Dark Mode"></button>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let username;
+        let typingTimer;
+        const typingInterval = 200; // 0.2 seconds
+        let isTyping = false;
+        let messagePage = 1; // Start with page 1 for message loading
+        const messagesList = document.getElementById('messages');
+
+
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const header = document.querySelector('header');
+        const messageInput = document.getElementById('input');
+        const messageForm = document.getElementById('form');
+        const homepageDiv = document.querySelector('.homepage');
+        const formContainerDiv = document.querySelector('.form-container');
+        const formInputGroups = document.querySelectorAll('.input-group input');
+        const systemMessages = document.querySelectorAll('#messages li.system-message');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+
+        // Function to toggle dark mode (remains the same)
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            container.classList.toggle('dark-mode');
+            header.classList.toggle('dark-mode');
+            messagesList.classList.toggle('dark-mode');
+            messageInput.classList.toggle('dark-mode');
+            messageForm.classList.toggle('dark-mode');
+            if (homepageDiv) homepageDiv.classList.toggle('dark-mode');
+            if (formContainerDiv) formContainerDiv.classList.toggle('dark-mode');
+            formInputGroups.forEach(input => input.classList.toggle('dark-mode'));
+            Array.from(messagesList.children).forEach(item => item.classList.toggle('dark-mode')); // Apply to existing messages
+            systemMessages.forEach(msg => msg.classList.toggle('dark-mode'));
+
+
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateToggleButtonText(isDarkMode);
+        }
+
+        function updateToggleButtonText(isDarkMode) {
+            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Light Mode' : 'Dark Mode');
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateToggleButtonText(localStorage.getItem('darkMode') === 'true');
+
+            // Check for dark mode preference in local storage
+            const storedDarkMode = localStorage.getItem('darkMode');
+            if (storedDarkMode === 'true') {
+                toggleDarkMode();
+            }
+
+            // Load initial messages
+            loadMessages();
+
+            // Set username and header text
+            fetch('/get-username')
+                .then(response => response.json())
+                .then(data => {
+                    username = data.username;
+                    socket.emit('set-username', username);
+                    document.querySelector('header h1').textContent = `Welcome to the Chatroom, ${username}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching username:', error);
+                    username = 'User';
+                    socket.emit('set-username', username);
+                    document.querySelector('header h1').textContent = `Welcome to the Chatroom, ${username}`;
+                });
+
+            // Dark mode toggle button event listener
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+
+
+            const form = document.getElementById('form');
+            const input = document.getElementById('input');
+
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (input.value) {
+                    socket.emit('chat message', input.value);
+                    socket.emit('typing', false);
+                    isTyping = false;
+                    typingIndicator.textContent = '';
+                    input.value = '';
+                }
+            });
+
+            input.addEventListener('focus', () => {
+                if (!isTyping) {
+                    isTyping = true;
+                    socket.emit('typing', true);
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                clearTimeout(typingTimer);
+                if (isTyping) {
+                    isTyping = false;
+                    socket.emit('typing', false);
+                    typingIndicator.textContent = '';
+                }
+            });
+
+
+            socket.on('chat message', function(data) {
+                appendMessage(data);
+            });
+
+            socket.on('user-join', function(message) {
+                appendSystemMessage(message);
+            });
+
+            socket.on('user-leave', function(message) {
+                appendSystemMessage(message);
+            });
+
+            socket.on('typing-update', function(data) {
+                if (data.isTyping && data.username !== username) {
+                    typingIndicator.textContent = `${data.username} is typing...`;
+                } else if (!data.isTyping && data.username !== username) {
+                    typingIndicator.textContent = '';
+                }
+            });
+
+            function appendMessage(data) {
+                const item = document.createElement('li');
+                item.innerHTML = `<b>${data.username}:</b> ${data.message} <span class="message-time" data-timestamp="${data.timestamp}"></span>`;
+                messagesList.appendChild(item);
+                if (body.classList.contains('dark-mode')) {
+                    item.classList.add('dark-mode');
+                }
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+
+            function appendSystemMessage(message) {
+                const item = document.createElement('li');
+                item.classList.add('system-message');
+                item.textContent = message;
+                messagesList.appendChild(item);
+                if (body.classList.contains('dark-mode')) {
+                    item.classList.add('dark-mode');
+                }
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+
+            function loadMessages() {
+                fetch(`/load-messages?page=${messagePage}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.messages && data.messages.length > 0) {
+                            data.messages.forEach(messageData => {
+                                appendMessage(messageData);
+                            });
+                            messagePage++; // Increment page for next load
+                        } else if (messagePage === 1) {
+                            appendSystemMessage("No messages yet. Be the first to chat!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading messages:', error);
+                        appendSystemMessage("Could not load past messages.");
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Register</h1>
+        </header>
+        <div class="form-container">
+            <form action="/register" method="POST">
+                <div class="input-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <div class="auth-links">
+                <a href="/login">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+    <button id="dark-mode-toggle" aria-label="Toggle Dark Mode"></button>
+    <script>
+        const body = document.body;
+        const container = document.querySelector('.container');
+        const header = document.querySelector('header');
+        const formContainerDiv = document.querySelector('.form-container');
+        const formInputGroups = document.querySelectorAll('.input-group input');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            container.classList.toggle('dark-mode');
+            header.classList.toggle('dark-mode');
+            formContainerDiv.classList.toggle('dark-mode');
+            formInputGroups.forEach(input => input.classList.toggle('dark-mode'));
+
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateToggleButtonText(isDarkMode);
+        }
+        function updateToggleButtonText(isDarkMode) {
+            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Light Mode' : 'Dark Mode');
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateToggleButtonText(localStorage.getItem('darkMode') === 'true');
+            const storedDarkMode = localStorage.getItem('darkMode');
+            if (storedDarkMode === 'true') {
+                toggleDarkMode();
+            }
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        });
+    </script>
+</body>
+</html>

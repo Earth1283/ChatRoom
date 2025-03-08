@@ -1,0 +1,350 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #eeeeee;
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container.dark-mode {
+    background-color: #333;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+
+header {
+    background-color: #0056b3;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header.dark-mode {
+    background-color: #002b5e;
+}
+
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #d9534f;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c;
+}
+
+
+#chat-window {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+#messages {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#messages.dark-mode {
+    background-color: #252525;
+    border-color: #555;
+    color: #eee;
+}
+
+
+#messages li {
+    padding: 5px 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    background-color: #e9e9e9;
+    color: #333;
+    word-wrap: break-word;
+    position: relative; /* For positioning time */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#messages li.dark-mode {
+    background-color: #444;
+    color: #eee;
+}
+
+
+#messages li:nth-child(odd) {
+    background-color: #f0f0f0;
+}
+
+#messages li.dark-mode:nth-child(odd) {
+    background-color: #555;
+}
+
+
+#messages li.system-message {
+    background-color: lightgoldenrodyellow;
+    font-style: italic;
+    text-align: center;
+    color: grey;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#messages li.system-message.dark-mode {
+    background-color: #555;
+    color: #ccc;
+}
+
+/* Typing indicator styles */
+#typing-indicator {
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    font-style: italic;
+    color: #777;
+    text-align: left; /* Align typing indicator to the left */
+    min-height: 20px; /* Ensure space even when empty */
+    transition: color 0.3s;
+}
+
+#typing-indicator.dark-mode {
+    color: #aaa; /* Lighter color in dark mode */
+}
+
+/* Message time style */
+.message-time {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    font-size: 0.8em;
+    visibility: hidden; /* Initially hidden */
+}
+
+#messages li:hover .message-time {
+    visibility: visible; /* Show on hover */
+}
+
+#form {
+    display: flex;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #eee;
+    border-top: 1px solid #ddd;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#form.dark-mode {
+    background-color: #333;
+    border-top-color: #555;
+}
+
+
+#input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    margin-right: 0;
+    font-size: 1em;
+    background-color: #fff;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#input.dark-mode {
+    background-color: #444;
+    color: #eee;
+    border-color: #555;
+}
+
+
+#input:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+}
+
+#form button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+#form button:hover {
+    background-color: #0056b3;
+}
+
+.homepage, .form-container {
+    padding: 30px;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.homepage.dark-mode, .form-container.dark-mode {
+    background-color: #333;
+    color: #eee;
+}
+
+
+.homepage h1 {
+    color: #0056b3;
+    transition: color 0.3s;
+}
+
+.homepage h1.dark-mode {
+    color: #66a5ff;
+}
+
+
+.homepage p {
+    font-size: 1.1em;
+    margin-top: 20px;
+}
+
+.homepage a, .form-container a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.homepage.dark-mode a, .form-container.dark-mode a {
+    color: #66a5ff;
+}
+
+
+.homepage a:hover, .form-container a:hover {
+    text-decoration: underline;
+}
+
+
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-container h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+    transition: color 0.3s;
+}
+
+.form-container h2.dark-mode {
+    color: #66a5ff;
+}
+
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.input-group input.dark-mode {
+    border-color: #555;
+    background-color: #444;
+    color: #eee;
+}
+
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.auth-links {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+/* Updated Dark Mode Toggle Button Style */
+#dark-mode-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.3s ease;
+}
+
+#dark-mode-toggle:hover {
+    transform: scale(1.1);
+}
+
+#dark-mode-toggle:focus {
+    outline: none;
+}
