@@ -109,7 +109,7 @@ Follow these steps to get the chatroom application running on your local machine
 
 ## License
 
-This project is licensed under the MIT License
+This program is proudly licensed under the [Mit License](https://github.com/Earth1283/ChatRoom/blob/main/LICENSE)
 
 ---
 
